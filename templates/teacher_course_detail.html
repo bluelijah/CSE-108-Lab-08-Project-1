@@ -1,116 +1,71 @@
 {% extends "base.html" %}
-
-{% block title %}{{ course.course_name }} - ACME University{% endblock %}
-
+{% block title %}{{ course.course_name }} · ACME{% endblock %}
 {% block content %}
-<div class="header">
-    <div class="welcome">Welcome {{ full_name }}!</div>
-    <h1>ACME University</h1>
-    <a href="{{ url_for('logout') }}" class="logout-link">Sign out</a>
-</div>
+  <div class="card" style="margin-bottom:20px;">
+    <div class="card-header">
+      <h2 class="card-title">{{ course.course_name }}</h2>
+      <span class="badge">Course Detail</span>
+    </div>
+    <p class="label">Time: {{ course.time }}</p>
+    <p class="label">Enrolled:
+      {{ course.enrolled if course.enrolled is defined
+         else (course.get_enrolled_count() if course.get_enrolled_count is defined else '') }}
+      / {{ course.capacity }}</p>
+    <a class="btn btn-ghost" href="{{ url_for('teacher_dashboard') }}" style="margin-top:8px;">← Back</a>
+  </div>
 
-<div class="content">
-    <!-- Back link to teacher dashboard -->
-    <a class="back-arrow" href="{{ url_for('teacher_dashboard') }}">← Back</a>
-
-    <!-- Course title -->
-    <h2 style="margin-top: 10px;">{{ course.course_name }}</h2>
-
-    <!-- Students table with editable grades -->
-    <table>
-        <thead>
-            <tr>
-                <th>Student Name</th>
-                <th style="width: 180px;">Grade</th>
-                <th style="width: 140px;">Status</th>
-            </tr>
-        </thead>
+  <section class="card">
+    <div class="card-header"><h3 class="card-title">Enrolled Students</h3></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Student Name</th><th style="width:180px;">Grade</th><th style="width:140px;">Status</th></tr></thead>
         <tbody>
-            {% if students %}
-                {% for student in students %}
-                <tr>
-                    <!-- Student display name -->
-                    <td>{{ student.student_name }}</td>
-                    <!-- Editable grade input: triggers updateGrade on change -->
-                    <td>
-                        <input type="number"
-                               id="grade-{{ student.enrollment_id }}"
-                               value="{{ '%.1f'|format(student.grade) if student.grade is not none else '' }}"
-                               min="0"
-                               max="100"
-                               step="0.1"
-                               onchange="updateGrade({{ student.enrollment_id }}, this)">
-                    </td>
-                    <!-- Status cell: shows saving/saved/error messages -->
-                    <td>
-                        <span id="status-{{ student.enrollment_id }}" aria-live="polite"></span>
-                    </td>
-                </tr>
-                {% endfor %}
-            {% else %}
-                <tr>
-                    <td colspan="3" style="text-align: center;">No students enrolled yet</td>
-                </tr>
-            {% endif %}
+          {% for student in students %}
+            <tr>
+              <td>{{ student.student_name or student.full_name or student.name or (student.first_name ~ ' ' ~ student.last_name) }}</td>
+              <td>
+                <input type="number"
+                       id="grade-{{ student.enrollment_id }}"
+                       value="{{ '%.1f'|format(student.grade) if student.grade is not none else '' }}"
+                       min="0" max="100" step="0.1"
+                       onchange="updateGrade({{ student.enrollment_id }}, this)">
+              </td>
+              <td><span id="status-{{ student.enrollment_id }}" aria-live="polite"></span></td>
+            </tr>
+          {% else %}
+            <tr><td colspan="3" style="text-align:center;">No students yet.</td></tr>
+          {% endfor %}
         </tbody>
-    </table>
-</div>
+      </table>
+    </div>
+  </section>
 {% endblock %}
 
 {% block scripts %}
 <script>
-    // updateGrade: send new grade to server and show inline status
-    // el is the input element that triggered the change
-    function updateGrade(enrollmentId, el) {
-        const statusEl = document.getElementById('status-' + enrollmentId);
-        const inputEl = el.tagName ? el : document.getElementById('grade-' + enrollmentId);
-        const raw = inputEl.value;
+  function updateGrade(enrollmentId, el){
+    const statusEl = document.getElementById('status-' + enrollmentId);
+    const inputEl  = el.tagName ? el : document.getElementById('grade-' + enrollmentId);
+    const raw = inputEl.value;
 
-        // simple client-side validation
-        if (raw === '' || isNaN(raw)) {
-            statusEl.textContent = 'Invalid';
-            statusEl.style.color = '#d9534f';
-            return;
-        }
+    if (raw === '' || isNaN(raw)) { statusEl.textContent='Invalid'; statusEl.style.color='#ef4444'; return; }
+    const grade = parseFloat(raw);
+    if (grade < 0 || grade > 100) { statusEl.textContent='Must be 0–100'; statusEl.style.color='#ef4444'; return; }
 
-        const grade = parseFloat(raw);
-        if (grade < 0 || grade > 100) {
-            statusEl.textContent = 'Must be 0–100';
-            statusEl.style.color = '#d9534f';
-            return;
-        }
+    statusEl.textContent='Saving…'; statusEl.style.color='#9aa4b2'; inputEl.disabled = true;
 
-        // show saving state and disable input while saving
-        statusEl.textContent = 'Saving...';
-        statusEl.style.color = '#333';
-        inputEl.disabled = true;
-
-        fetch('/api/update_grade', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ enrollment_id: enrollmentId, grade: grade })
-        })
-        .then(response => response.json())
-        .then(data => {
-            inputEl.disabled = false;
-            if (data.success) {
-                statusEl.textContent = 'Saved';
-                statusEl.style.color = '#28a745';
-                // hide the message after 2 seconds
-                setTimeout(() => { statusEl.textContent = ''; }, 2000);
-            } else {
-                statusEl.textContent = data.error || 'Error';
-                statusEl.style.color = '#d9534f';
-            }
-        })
-        .catch(err => {
-            console.error(err);
-            inputEl.disabled = false;
-            statusEl.textContent = 'Network error';
-            statusEl.style.color = '#d9534f';
-        });
-    }
+    fetch('/api/update_grade', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ enrollment_id: enrollmentId, grade: grade })
+    })
+    .then(r => r.json())
+    .then(d => {
+      inputEl.disabled=false;
+      if(d.success){ statusEl.textContent='Saved'; statusEl.style.color='#22c55e'; setTimeout(()=>statusEl.textContent='',1500); }
+      else { statusEl.textContent=d.error||'Error'; statusEl.style.color='#ef4444'; }
+    })
+    .catch(()=>{ inputEl.disabled=false; statusEl.textContent='Network error'; statusEl.style.color='#ef4444'; });
+  }
 </script>
 {% endblock %}

@@ -1,0 +1,104 @@
+/* Dark theme — minimal, clean, neutral */
+:root{
+  --bg:#0b1220;        /* page background */
+  --panel:#111827;     /* cards */
+  --panel-2:#0f172a;   /* header */
+  --text:#e5e7eb;      /* main text */
+  --muted:#9aa4b2;     /* subtle text */
+  --line:#273449;      /* borders */
+  --accent:#3b82f6;    /* primary */
+  --accent-strong:#2563eb;
+  --shadow:0 6px 20px rgba(0,0,0,.35);
+  --radius:16px;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+  line-height:1.5;
+}
+a{color:var(--accent);text-decoration:none}
+a:hover{color:var(--accent-strong)}
+.container{max-width:1100px;margin:0 auto;padding:0 20px}
+
+/* Top bar */
+.site-header{
+  position:sticky;top:0;z-index:50;background:var(--panel-2);
+  border-bottom:1px solid var(--line);box-shadow:var(--shadow)
+}
+.header-inner{display:flex;align-items:center;justify-content:space-between;height:64px}
+.brand{font-weight:700;letter-spacing:.4px;color:var(--text);font-size:20px}
+.nav{display:flex;align-items:center;gap:12px}
+
+/* Buttons */
+.btn,button{
+  appearance:none;border:1px solid transparent;border-radius:10px;
+  padding:.55rem .9rem;font-weight:600;cursor:pointer;transition:.15s;
+  background:transparent;color:var(--text)
+}
+.btn-primary,button.primary{background:var(--accent);color:#fff}
+.btn-primary:hover,button.primary:hover{background:var(--accent-strong)}
+.btn-ghost{background:transparent;color:var(--text);border:1px solid var(--line)}
+.btn-ghost:hover{background:#0b1220}
+
+/* Layout */
+.page{padding:28px 0 56px}
+.card{
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  padding:20px;box-shadow:var(--shadow)
+}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.card-title{font-weight:700;font-size:18px}
+.badge{padding:.15rem .45rem;border:1px solid var(--line);border-radius:8px;font-size:.85rem;color:var(--muted)}
+.card-center{max-width:480px;margin:40px auto}
+
+/* Forms */
+.form{display:grid;gap:14px}
+.label{color:var(--muted);font-size:.95rem}
+.input,
+input[type=text],input[type=password],input[type=number],
+input[type=email],select,textarea{
+  width:100%;background:#0b1220;color:var(--text);
+  border:1px solid var(--line);border-radius:10px;padding:.6rem .7rem;
+  outline:none;transition:.15s
+}
+.input:focus,input:focus,select:focus,textarea:focus{
+  border-color:var(--accent);box-shadow:0 0 0 3px rgba(59,130,246,.15)
+}
+
+/* Tables */
+.table-wrap{overflow:auto}
+table{
+  width:100%;border-collapse:separate;border-spacing:0;min-width:720px;
+  background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden
+}
+th,td{padding:.8rem .9rem;text-align:left;border-bottom:1px solid var(--line)}
+th{background:#192233;color:#cdd5e1;font-weight:700}
+tbody tr:nth-child(odd){background:#0f1829}
+tr:last-child td{border-bottom:0}
+tbody tr:hover{background:#13203a}
+
+/* Flash messages */
+.flash{margin-bottom:16px}
+.flash p{
+  background:#102036;border:1px solid var(--line);color:#cfe1ff;
+  padding:.7rem .9rem;border-radius:10px
+}
+
+/* Grid helpers */
+.grid{display:grid;gap:20px}
+.grid-2{grid-template-columns:1fr}
+@media (min-width:980px){.grid-2{grid-template-columns:1fr 1fr}}
+
+ /* Tabs */
+.tabs{display:flex;gap:10px;margin:10px 0 16px}
+.tab{
+  border:1px solid var(--line);background:#0b1220;color:var(--text);
+  padding:.5rem .9rem;border-radius:10px;font-weight:600;cursor:pointer
+}
+.tab.active{background:var(--accent);color:#fff;border-color:transparent}
+.tab-panel.is-hidden{display:none}

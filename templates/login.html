@@ -1,104 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ACME University - Login</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #e8f0f7;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        .login-container {
-            background-color: #d0e0f0;
-            border: 3px solid #5a8db8;
-            padding: 60px;
-            width: 500px;
-            text-align: center;
-        }
-
-        h1 {
-            font-size: 2.5em;
-            margin-bottom: 60px;
-            color: #333;
-        }
-
-        .form-group {
-            margin-bottom: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        label {
-            font-size: 1.2em;
-            margin-right: 20px;
-            min-width: 120px;
-            text-align: right;
-        }
-
-        input[type="text"],
-        input[type="password"] {
-            padding: 10px;
-            font-size: 1.1em;
-            border: 2px solid #5a8db8;
-            width: 300px;
-        }
-
-        .btn-login {
-            background-color: #5a8db8;
-            color: white;
-            padding: 15px 80px;
-            font-size: 1.2em;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-            margin-top: 20px;
-        }
-
-        .btn-login:hover {
-            background-color: #4a7ba7;
-        }
-
-        .error {
-            color: #d9534f;
-            margin-top: 20px;
-            font-size: 1.1em;
-        }
-    </style>
-</head>
-<body>
-    <div class="login-container">
-        <h1>ACME University</h1>
-
-        <form method="POST" action="{{ url_for('login') }}">
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" required>
-            </div>
-
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" required>
-            </div>
-
-            <button type="submit" class="btn-login">Sign in</button>
-        </form>
-
-        {% if error %}
-        <div class="error">{{ error }}</div>
-        {% endif %}
+{% extends "base.html" %}
+{% block title %}Sign in · ACME{% endblock %}
+{% block content %}
+  <div class="card card-center">
+    <div class="card-header">
+      <h2 class="card-title">Sign in</h2>
     </div>
-</body>
-</html>
+    <form class="form" method="post">
+      <label class="label">Username</label>
+      <input class="input" type="text" name="username" required>
+
+      <label class="label">Password</label>
+      <input class="input" type="password" name="password" required>
+
+      <button class="btn btn-primary" type="submit">Sign in</button>
+    </form>
+  </div>
+{% endblock %}
