@@ -74,9 +74,9 @@ This will create the database and populate it with sample data.
 python app.py
 ```
 
-The application will be available at: `http://localhost:5000`
-Login Page: http://localhost:5000/login
-Admin Page: http://localhost:5000/admin
+The application will be available at: `http://localhost:5001`
+Login Page: http://localhost:5001/login
+Admin Page: http://localhost:5001/admin
 
 ## Sample Login Credentials
 

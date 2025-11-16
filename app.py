@@ -344,4 +344,4 @@ if __name__ == '__main__':
         db.create_all()
         print("Database tables created!")
 
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=5001) #PORT LOCATION
