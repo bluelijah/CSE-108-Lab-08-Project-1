@@ -27,3 +27,11 @@ Thumbs.db
 
 # Claude
 .claude/
+
+
+__pycache__/
+*.pyc
+.venv/
+*.db
+*.sqlite
+.DS_Store

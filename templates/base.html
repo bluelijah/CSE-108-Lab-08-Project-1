@@ -1,190 +1,35 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>{% block title %}ACME University{% endblock %}</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="/">ACME University</a>
+        <nav class="nav">
+          {% if 'user_id' in session %}
+            <a class="btn btn-ghost" href="{{ url_for('logout') }}">Sign out</a>
+          {% endif %}
+        </nav>
+      </div>
+    </header>
 
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #e8f0f7;
-        }
+    <main class="container page">
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div class="flash">
+            {% for m in messages %}<p>{{ m }}</p>{% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+      {% block content %}{% endblock %}
+    </main>
 
-        .header {
-            background-color: #d0e0f0;
-            padding: 20px;
-            border: 2px solid #5a8db8;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .header h1 {
-            text-align: center;
-            flex-grow: 1;
-            font-size: 2em;
-        }
-
-        .course-header{
-            flex: 1;
-            padding: 15px;
-            text-align: center;
-            background-color: #5a8db8;
-            color: white;
-            border: 2px solid #5a8db8;
-            font-size: 1.1em;
-            font-weight: bold;
-
-        }
-
-        p.course-instructions{
-            padding: 15px;
-            font-weight: bold;
-            text-align: center;
-        }
-
-        .welcome {
-            font-size: 1.1em;
-        }
-
-        .logout-link {
-            text-decoration: none;
-            color: #4a7ba7;
-            font-weight: bold;
-        }
-
-        .logout-link:hover {
-            text-decoration: underline;
-        }
-
-        .content {
-            background-color: #d0e0f0;
-            padding: 30px;
-            border: 2px solid #5a8db8;
-            min-height: 400px;
-        }
-
-        .tabs {
-            display: flex;
-            margin-bottom: 20px;
-        }
-
-        .tab {
-            flex: 1;
-            padding: 15px;
-            text-align: center;
-            background-color: #b8d4e8;
-            border: 2px solid #5a8db8;
-            cursor: pointer;
-            font-size: 1.1em;
-            font-weight: bold;
-        }
-
-        .tab.active {
-            background-color: #5a8db8;
-            color: white;
-        }
-
-        .tab:hover {
-            background-color: #7aa3c9;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: white;
-        }
-
-        th {
-            background-color: #7aa3c9;
-            color: white;
-            padding: 15px;
-            text-align: left;
-            border: 1px solid #5a8db8;
-        }
-
-        td {
-            padding: 12px;
-            border: 1px solid #5a8db8;
-            background-color: #e8f0f7;
-        }
-
-        tr:nth-child(even) td {
-            background-color: #d0e0f0;
-        }
-
-        .btn {
-            padding: 8px 16px;
-            border: none;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: bold;
-            border-radius: 3px;
-        }
-
-        .btn-add {
-            background-color: #5a8db8;
-            color: white;
-        }
-
-        .btn-add:hover {
-            background-color: #4a7ba7;
-        }
-
-        .btn-remove {
-            background-color: #d9534f;
-            color: white;
-        }
-
-        .btn-remove:hover {
-            background-color: #c9302c;
-        }
-
-        .btn-add:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
-        }
-
-        .back-arrow {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #5a8db8;
-            color: white;
-            text-decoration: none;
-            font-size: 1.5em;
-            border-radius: 3px;
-            margin-bottom: 20px;
-        }
-
-        .back-arrow:hover {
-            background-color: #4a7ba7;
-        }
-
-        input[type="number"] {
-            width: 80px;
-            padding: 5px;
-            border: 1px solid #5a8db8;
-        }
-    </style>
-    {% block extra_styles %}{% endblock %}
-</head>
-<body>
-    <div class="container">
-        {% block content %}{% endblock %}
-    </div>
     {% block scripts %}{% endblock %}
-</body>
+  </body>
 </html>
