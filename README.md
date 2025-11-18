@@ -80,23 +80,78 @@ Admin Page: http://localhost:5001/admin
 
 ## Sample Login Credentials
 
+> **Note:** All sample data is loaded from `Enrollment example data for Lab8-1.xlsx`
+
 ### Students
-- **Username:** `cnorris` | **Password:** `password123` (Chuck Norris)
-- **Username:** `msherman` | **Password:** `password123` (Mindy Sherman)
-- **Username:** `aranganath` | **Password:** `password123` (Aditya Ranganath)
-- **Username:** `nlittle` | **Password:** `password123` (Nancy Little)
-- **Username:** `ychen` | **Password:** `password123` (Yi Wen Chen)
-- **Username:** `jstuart` | **Password:** `password123` (John Stuart)
+| Username | Password | Full Name | Enrolled Courses |
+|----------|----------|-----------|------------------|
+| `jsantos` | `password123` | Jose Santos | Math 101 |
+| `bbrown` | `password123` | Betty Brown | Math 101, Physics 121 |
+| `jstuart` | `password123` | John Stuart | Math 101, Physics 121, CS 162 |
+| `lcheng` | `password123` | Li Cheng | Math 101, Physics 121 |
+| `nlittle` | `password123` | Nancy Little | Physics 121, CS 106, CS 162 |
+| `mnorris` | `password123` | Mindy Norris | Physics 121, CS 106 |
+| `aranganath` | `password123` | Aditya Ranganath | CS 106, CS 162 |
+| `ychen` | `password123` | Yi Wen Chen | CS 106, CS 162 |
 
 ### Teachers
-- **Username:** `ahepworth` | **Password:** `password123` (Dr Hepworth)
-- **Username:** `swalker` | **Password:** `password123` (Susan Walker)
-- **Username:** `rjenkins` | **Password:** `password123` (Ralph Jenkins)
+| Username | Password | Full Name | Courses Teaching |
+|----------|----------|-----------|------------------|
+| `ahepworth` | `password123` | Ammon Hepworth | CS 106, CS 162 |
+| `swalker` | `password123` | Susan Walker | Physics 121 |
+| `rjenkins` | `password123` | Ralph Jenkins | Math 101 |
 
 ### Admin
-- **Username:** `admin` | **Password:** `admin123`
+| Username | Password | Full Name | Access |
+|----------|----------|-----------|--------|
+| `admin` | `admin123` | System Administrator | Full CRUD access to all tables |
 
 To access the admin panel, login as admin and navigate to `/admin`
+
+## Course Enrollment Data
+
+The database is initialized with the following courses and enrollments:
+
+### Math 101
+- **Teacher:** Ralph Jenkins
+- **Time:** MWF 10:00-10:50 AM
+- **Capacity:** 4/8 students
+- **Enrolled Students:**
+  - Jose Santos (Grade: 92)
+  - Betty Brown (Grade: 65)
+  - John Stuart (Grade: 86)
+  - Li Cheng (Grade: 77)
+
+### Physics 121
+- **Teacher:** Susan Walker
+- **Time:** TR 11:00-11:50 AM
+- **Capacity:** 5/10 students
+- **Enrolled Students:**
+  - Nancy Little (Grade: 53)
+  - Li Cheng (Grade: 85)
+  - Mindy Norris (Grade: 94)
+  - John Stuart (Grade: 91)
+  - Betty Brown (Grade: 88)
+
+### CS 106
+- **Teacher:** Ammon Hepworth
+- **Time:** MWF 2:00-2:50 PM
+- **Capacity:** 4/10 students
+- **Enrolled Students:**
+  - Aditya Ranganath (Grade: 93)
+  - Yi Wen Chen (Grade: 85)
+  - Nancy Little (Grade: 57)
+  - Mindy Norris (Grade: 68)
+
+### CS 162
+- **Teacher:** Ammon Hepworth
+- **Time:** TR 3:00-3:50 PM
+- **Capacity:** 4/4 students ⚠️ **FULL**
+- **Enrolled Students:**
+  - Aditya Ranganath (Grade: 99)
+  - Nancy Little (Grade: 87)
+  - Yi Wen Chen (Grade: 92)
+  - John Stuart (Grade: 67)
 
 ## Database Schema
 
