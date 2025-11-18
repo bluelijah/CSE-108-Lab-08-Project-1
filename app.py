@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify, session, redirect, u
 from flask_sqlalchemy import SQLAlchemy
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
+from flask_admin.menu import MenuLink
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 
@@ -100,6 +101,8 @@ admin = Admin(app, name='ACME University Admin', template_mode='bootstrap3')
 admin.add_view(SecureModelView(User, db.session))
 admin.add_view(SecureModelView(Course, db.session))
 admin.add_view(SecureModelView(Enrollment, db.session))
+# Add a logout link to the admin interface so admins can sign out easily
+admin.add_link(MenuLink(name='Logout', url='/logout'))
 
 
 #==================== Routes ====================
