@@ -166,8 +166,10 @@ def logout():
 @app.route('/student/dashboard')
 def student_dashboard():
     """Student dashboard showing their courses and available courses"""
-    if 'user_id' not in session or session.get('role') != 'student':
+    if 'user_id' not in session:
         return redirect(url_for('login'))
+    if session.get('role') != 'student':
+        return redirect(url_for('index'))
 
     user_id = session['user_id']
 
@@ -206,8 +208,10 @@ def student_dashboard():
 @app.route('/teacher/dashboard')
 def teacher_dashboard():
     """Teacher dashboard showing their courses and enrolled students"""
-    if 'user_id' not in session or session.get('role') != 'teacher':
+    if 'user_id' not in session:
         return redirect(url_for('login'))
+    if session.get('role') != 'teacher':
+        return redirect(url_for('index'))
 
     user_id = session['user_id']
 
@@ -231,8 +235,10 @@ def teacher_dashboard():
 @app.route('/teacher/course/<int:course_id>')
 def teacher_course_detail(course_id):
     """View students and grades for a specific course"""
-    if 'user_id' not in session or session.get('role') != 'teacher':
+    if 'user_id' not in session:
         return redirect(url_for('login'))
+    if session.get('role') != 'teacher':
+        return redirect(url_for('index'))
 
     course = Course.query.get_or_404(course_id)
 
@@ -262,8 +268,15 @@ def enroll_in_course():
     if 'user_id' not in session or session.get('role') != 'student':
         return jsonify({'error': 'Unauthorized'}), 401
 
-    data = request.get_json()
+    # Handle both JSON and form data
+    data = request.get_json() if request.is_json else request.form
     course_id = data.get('course_id')
+
+    # Convert to int if it's a string
+    try:
+        course_id = int(course_id) if course_id else None
+    except (ValueError, TypeError):
+        return jsonify({'error': 'Invalid course ID'}), 400
 
     course = Course.query.get(course_id)
     if not course:
@@ -286,7 +299,11 @@ def enroll_in_course():
     db.session.add(enrollment)
     db.session.commit()
 
-    return jsonify({'success': True, 'message': 'Enrolled successfully'}), 200
+    # Redirect for form submissions, JSON for API calls
+    if request.is_json:
+        return jsonify({'success': True, 'message': 'Enrolled successfully'}), 200
+    else:
+        return redirect(url_for('student_dashboard'))
 
 
 @app.route('/api/unenroll', methods=['POST'])
@@ -295,8 +312,15 @@ def unenroll_from_course():
     if 'user_id' not in session or session.get('role') != 'student':
         return jsonify({'error': 'Unauthorized'}), 401
 
-    data = request.get_json()
+    # Handle both JSON and form data
+    data = request.get_json() if request.is_json else request.form
     course_id = data.get('course_id')
+
+    # Convert to int if it's a string
+    try:
+        course_id = int(course_id) if course_id else None
+    except (ValueError, TypeError):
+        return jsonify({'error': 'Invalid course ID'}), 400
 
     enrollment = Enrollment.query.filter_by(
         student_id=session['user_id'],
@@ -309,7 +333,11 @@ def unenroll_from_course():
     db.session.delete(enrollment)
     db.session.commit()
 
-    return jsonify({'success': True, 'message': 'Unenrolled successfully'}), 200
+    # Redirect for form submissions, JSON for API calls
+    if request.is_json:
+        return jsonify({'success': True, 'message': 'Unenrolled successfully'}), 200
+    else:
+        return redirect(url_for('student_dashboard'))
 
 
 @app.route('/api/update_grade', methods=['POST'])
