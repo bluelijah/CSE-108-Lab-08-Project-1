@@ -299,6 +299,99 @@ def teacher_course_detail(course_id):
                          full_name=session['full_name'])
 
 
+#==================== Helper Functions ====================
+
+def parse_time_slot(time_str):
+    """
+    Parse a time string like 'MWF 2:00-2:50 PM' or 'TR 11:00-11:50 AM'
+    Returns: (days_set, start_minutes, end_minutes) or None if invalid
+    """
+    try:
+        parts = time_str.strip().split()
+        if len(parts) < 2:
+            return None
+
+        days_str = parts[0]
+        time_range = ' '.join(parts[1:])
+
+        # Parse days
+        days = set()
+        i = 0
+        while i < len(days_str):
+            if i + 1 < len(days_str) and days_str[i:i+2] in ['TR', 'Th']:
+                days.add('R')  # Thursday
+                i += 2
+            elif days_str[i] in ['M', 'T', 'W', 'F']:
+                days.add(days_str[i])
+                i += 1
+            else:
+                i += 1
+
+        # Parse time range (e.g., "2:00-2:50 PM" or "11:00-11:50 AM")
+        if '-' not in time_range:
+            return None
+
+        times = time_range.split('-')
+        start_time = times[0].strip()
+        end_time_full = times[1].strip()
+
+        # Determine AM/PM
+        is_pm = 'PM' in end_time_full.upper()
+        end_time = end_time_full.replace('AM', '').replace('PM', '').strip()
+
+        # If start time doesn't have AM/PM, inherit from end time
+        if 'AM' not in start_time.upper() and 'PM' not in start_time.upper():
+            start_is_pm = is_pm
+        else:
+            start_is_pm = 'PM' in start_time.upper()
+            start_time = start_time.replace('AM', '').replace('PM', '').strip()
+
+        # Convert to minutes since midnight
+        start_hour, start_min = map(int, start_time.split(':'))
+        end_hour, end_min = map(int, end_time.split(':'))
+
+        # Handle 12-hour format
+        if start_is_pm and start_hour != 12:
+            start_hour += 12
+        elif not start_is_pm and start_hour == 12:
+            start_hour = 0
+
+        if is_pm and end_hour != 12:
+            end_hour += 12
+        elif not is_pm and end_hour == 12:
+            end_hour = 0
+
+        start_minutes = start_hour * 60 + start_min
+        end_minutes = end_hour * 60 + end_min
+
+        return (days, start_minutes, end_minutes)
+    except:
+        return None
+
+
+def has_time_conflict(time1, time2):
+    """
+    Check if two course times conflict
+    Returns True if there's a conflict, False otherwise
+    """
+    slot1 = parse_time_slot(time1)
+    slot2 = parse_time_slot(time2)
+
+    # If either time can't be parsed, assume no conflict (fail gracefully)
+    if not slot1 or not slot2:
+        return False
+
+    days1, start1, end1 = slot1
+    days2, start2, end2 = slot2
+
+    # Check if they share any days
+    if not days1.intersection(days2):
+        return False
+
+    # Check if times overlap (conflict if one starts before the other ends)
+    return not (end1 <= start2 or end2 <= start1)
+
+
 #==================== API Routes ====================
 
 @app.route('/api/enroll', methods=['POST'])
@@ -332,6 +425,12 @@ def enroll_in_course():
 
     if existing:
         return jsonify({'error': 'Already enrolled'}), 400
+
+    #check for time conflicts with student's existing courses
+    student_enrollments = Enrollment.query.filter_by(student_id=session['user_id']).all()
+    for enrollment in student_enrollments:
+        if has_time_conflict(course.time, enrollment.course.time):
+            return jsonify({'error': f'Time conflict with {enrollment.course.course_name}'}), 400
 
     #create enrollment
     enrollment = Enrollment(student_id=session['user_id'], course_id=course_id)
