@@ -33,7 +33,6 @@ class User(db.Model):
 
     #relationships
     enrollments = db.relationship('Enrollment', backref='student', lazy=True, foreign_keys='Enrollment.student_id')
-    taught_courses = db.relationship('Course', backref='instructor', lazy=True)
 
     def set_password(self, password):
         """Hash and set the user's password"""
@@ -58,6 +57,7 @@ class Course(db.Model):
     capacity = db.Column(db.Integer, nullable=False)
 
     #relationships
+    instructor = db.relationship('User', foreign_keys=[teacher_id], backref='courses_taught')
     enrollments = db.relationship('Enrollment', backref='course', lazy=True, cascade='all, delete-orphan')
 
     def get_enrolled_count(self):
@@ -96,10 +96,46 @@ class SecureModelView(ModelView):
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('login'))
 
+
+class UserAdmin(SecureModelView):
+    """Admin view for User - only shows basic fields"""
+    # Explicitly list only the fields we want in forms
+    form_columns = ('username', 'full_name', 'role')
+    column_list = ('username', 'full_name', 'role')
+    column_exclude_list = ('password_hash',)
+
+    def on_model_change(self, form, model, is_created):
+        """Set default password for new users"""
+        if is_created:
+            model.set_password('password123')
+
+
+class CourseAdmin(SecureModelView):
+    """Admin view for Course with instructor selection"""
+    column_list = ('course_name', 'instructor', 'time', 'capacity')
+
+    # Display instructor's full name in the list view
+    column_formatters = {
+        'instructor': lambda v, c, m, p: m.instructor.full_name if m.instructor else 'No Instructor'
+    }
+
+    # Exclude teacher_id from column display but include in form
+    form_columns = ('course_name', 'instructor', 'time', 'capacity')
+
+    # Customize form args to filter teachers only
+    form_args = {
+        'instructor': {
+            'label': 'Instructor',
+            'query_factory': lambda: User.query.filter_by(role='teacher').all(),
+            'get_label': 'full_name'
+        }
+    }
+
+
 #initialize Flask-Admin
 admin = Admin(app, name='ACME University Admin', template_mode='bootstrap3')
-admin.add_view(SecureModelView(User, db.session))
-admin.add_view(SecureModelView(Course, db.session))
+admin.add_view(UserAdmin(User, db.session))
+admin.add_view(CourseAdmin(Course, db.session))
 admin.add_view(SecureModelView(Enrollment, db.session))
 # Add a logout link to the admin interface so admins can sign out easily
 admin.add_link(MenuLink(name='Logout', url='/logout'))

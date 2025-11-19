@@ -66,6 +66,8 @@ pip install -r requirements.txt
 python init_db.py
 ```
 
+If port already in use: lsof -ti:5001 | xargs kill
+
 This will create the database and populate it with sample data.
 
 ### 5. Run the Application
